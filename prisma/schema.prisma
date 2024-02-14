@@ -70,28 +70,18 @@ model Book {
   categoryId    Int          @map("category_id")
   category      Category     @relation(fields: [categoryId], references: [id])
   basketItem    BasketItem[]
-  bookPrice     BookPrice[]
+  Price         Price[]
 
   @@map("books")
 }
 
-model BookPrice {
-  id        Int      @id @default(autoincrement())
-  bookId    Int      @map("book_id")
-  book      Book     @relation(fields: [bookId], references: [id])
-  priceId   Int      @map("price_id")
-  price     Price    @relation(fields: [priceId], references: [id])
-  createdAt DateTime @default(now()) @db.Timestamp(0)
-
-  @@map("book_price")
-}
-
 model Price {
-  id        Int         @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   price     Int
-  createdAt DateTime    @default(now()) @db.Timestamp(0)
-  expiredAt DateTime?   @db.Timestamp(0)
-  bookPrice BookPrice[]
+  bookId    Int       @map("book_id")
+  createdAt DateTime  @default(now()) @db.Timestamp(0)
+  expiredAt DateTime? @db.Timestamp(0)
+  Book      Book?     @relation(fields: [bookId], references: [id])
 
   @@map("prices")
 }
@@ -129,7 +119,7 @@ model BasketItem {
   amount    Int      @default(0)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
-  isActive Boolean @default(true)
+  isActive  Boolean  @default(true)
 
   @@map("basket_items")
 }

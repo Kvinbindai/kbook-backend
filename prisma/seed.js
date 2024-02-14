@@ -4,30 +4,35 @@ const prisma = new PrismaClient();
 const priceData = [
     {
         id : 1,
-        price : 500 ,
+        bookId : 1,
+        price : 500,
         createdAt : new Date(),
         
     },
     {
         id : 2,
+        bookId : 2,
         price : 600 ,
         createdAt : new Date(),
         
     },
     {
         id : 3,
+        bookId : 3,
         price : 700 ,
         createdAt : new Date(),
         
     },
     {
         id : 4,
+        bookId : 4,
         price : 800 ,
         createdAt : new Date(),
         
     },
     {
         id : 5,
+        bookId : 5,
         price : 900 ,
         createdAt : new Date(),
         
@@ -119,15 +124,16 @@ const bookData = [
 ]
 
 const generateData = async () => {
-    await prisma.price.createMany({
-      data: priceData,
-    });
+   
     await prisma.category.createMany({
       data: categoryData,
     });
     await prisma.book.createMany({
       data: bookData,
     });
+    await prisma.price.createMany({
+        data: priceData,
+      });
   };
   
   generateData();
