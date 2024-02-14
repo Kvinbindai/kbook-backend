@@ -1,4 +1,4 @@
-
+1
 ****************************************************
 /category
     HEADER req.user.role === admin
@@ -8,7 +8,7 @@ GET / all category
 GET /:id get category by id
 DELETE /:id hide category 
 ****************************************************
-
+2
 ****************************************************
 /book
     HEADER req.user.role === admin
@@ -19,11 +19,11 @@ BODY => {enTitle : string Or thTitle : string , enDescription : string or thDesc
 DELETE /:id hide book
 
     HEADER req.user.role === admin || user
-GET / all book
+GET / all book (isActive : true) => on user
+GET / all book (isActive : true & false) => on admin
 GET /:id getBookById
 ***************************************************
-
-
+3
 ***************************************************
 /transactions
     HEADER req.user.role === admin
@@ -36,7 +36,7 @@ BODY => { userId : Int , basketId : Int , totalPrice : Int , slipImage : string 
 province : string , district : string , sub_district : string , postCode : string , contactName : string , contactNumber : string , note : string }
 
 **************************************************
-
+4
 ****************************************************
 /contacts
     HEADER req.user.role === user
@@ -46,26 +46,7 @@ PATCH /:id edit contact
 BODY => {userId; Int,province : string , district : string , sub_district : string , postCode : string , contactName : string , contactNumber : string }
 
 ****************************************************
-
-****************************************************
-/price
-    HEADER req.user.role === admin
-POST / add price 
-BODY => {price : Int}
-PATCH /:id edit price
-BODY => {price : Int}
-
-****************************************************
-
-/bookPrice
-    HEADER req.user.role === admin
-POST / add bookPrice
-BODY => {bookId : Int , priceId : Int}
-
-
-****************************************************
-
-
+5
 ****************************************************
 /basket
     HEADER  req.user.role === user
@@ -73,7 +54,8 @@ POST / add basket for user
 BODY => { userId : Int }
 
 ****************************************************
-
+6
+****************************************************
 /basketItem
     HEADER req.user.role === user
 POST / add item to basket
@@ -82,6 +64,4 @@ PATCH /:basketId/:bookId
 BODY => { bookId : Int , amount : Int }
 DELETE /:basketId/:bookId
 BODY => set isActive : false
-
-
 ****************************************************

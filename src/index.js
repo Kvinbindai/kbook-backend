@@ -5,7 +5,7 @@ const app = express()
 const port = process.env.PORT
 const authRoute = require('./routes/auth-route')
 const categoryRoute = require('./routes/category-route')
-const priceRoute = require('./routes/price-route.js')
+
 const bookRoute = require('./routes/book-route')
 const { authenticate } = require('./middlewares/authenticate')
 
@@ -21,7 +21,7 @@ app.use(authenticate)
 
 
 app.use('/category',categoryRoute)
-app.use('/price',priceRoute)
+
 app.use('/books',bookRoute)
 
 

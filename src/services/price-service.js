@@ -1,43 +1,24 @@
 const prisma = require("../models/prisma");
 
 module.exports = {
-  create: (price) => {
-    return prisma.price.create({ data: { price: price } });
-  },
-  hide: (id) => {
-    return prisma.price.update({
-      where: { id },
+  createPriceByBookId: (price, bookId) => {
+    return prisma.price.create({
       data: {
-        expiredAt: Date.now(),
+        price: price,
+        bookId: bookId,
       },
     });
   },
-  getAll: () => {
-    return prisma.price.findMany({});
-  },
-  getOne: (id) => {
-    return prisma.price.findFirst({
+  updateExpiredPrice: (oldPriceId,bookId) => {
+    return prisma.price.update({
       where: {
-        id,
-      },
-    });
-  },
-
-  getCurrentPrice: (id) => {
-    return prisma.price.findFirst({
-      where: {
-        id,
+        id: oldPriceId,
+        bookId: bookId,
         expiredAt: null,
       },
+      data: {
+        expiredAt: new Date(),
+      },
     });
   },
-
-  updatePriceStatus : (id) => {
-    return prisma.price.update({
-      where : {id : id},
-      data : {
-        expiredAt : new Date()
-      }
-    })
-  }
 };

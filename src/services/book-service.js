@@ -1,20 +1,42 @@
 const prisma = require("../models/prisma");
+const priceService = require('../services/price-service')
+
+
+//เหลือ findBook
+
 
 module.exports = {
-  findBookById: (id) => {
-    return prisma.book.findFirst({
-      where: { id },
+  findAllBook: () => {
+    return prisma.book.findMany({
       include: {
-        bookPrice: {
-          include: {
-            price: {
-              select: {
-                price: true,
-                expiredAt: true,
-              },
-            },
+        price: {
+          where: {
+            expiredAt: null,
           },
         },
+      },
+    });
+  },
+
+  findBookById: (id) => {
+    return prisma.book.findFirst({
+      where: { 
+        id
+       },
+      select: {
+        id : true,
+        enTitle: true,
+        thTitle: true,
+        enDescription: true,
+        thDescription: true,
+        categoryId: true,
+        amount: true,
+        bookImage: true,
+        price: {
+          where : {
+            expiredAt : null
+          }
+        }
       },
     });
   },
@@ -29,49 +51,27 @@ module.exports = {
         categoryId: obj.categoryId,
         amount: obj.amount || 0,
         bookImage: obj.bookImage || null,
-        // ...obj,
-        bookPrice: {
+        price: {
           create: {
-            price: {
-              create: {
-                price: obj.price,
-                createdAt: new Date(),
-              },
-            },
+            price: obj.price,
+            expiredAt: null,
           },
         },
       },
       include: {
-        bookPrice: {
-          include: {
-            price: {
-              select: {
-                price: true,
-              },
-            },
+        price: {
+          select: {
+            price: true,
           },
         },
       },
     });
   },
-  //   updateBook: (oldObj, newObj) => {
-  //     return prisma.book.update({
-  //       where: { id: oldObj.id },
-  //       data: {
-  //         enTitle: newObj.enTitle || oldObj.enTitle,
-  //         thTitle: newObj.thTitle || oldObj.thTitle,
-  //         enDescription: newObj.enDescription || oldObj.enDescription,
-  //         thDescription: newObj.thDescription || oldObj.thDescription,
-  //         categoryId: newObj.categoryId || oldObj.categoryId,
-  //         amount: newObj.amount || oldObj.amount,
-  //         bookImage: newObj.bookImage || oldObj.bookImage,
-  //       }
-  //     });
-  //   },
-  updateBook: (oldObj, newObj, oldPriceId) => {
-    return prisma.book.upsert({
+  updateBook: async (oldObj, newObj) => {
+
+    return prisma.book.update({
       where: { id: oldObj.id },
-      update: {
+      data: {
         enTitle: newObj.enTitle || oldObj.enTitle,
         thTitle: newObj.thTitle || oldObj.thTitle,
         enDescription: newObj.enDescription || oldObj.enDescription,
@@ -79,36 +79,32 @@ module.exports = {
         categoryId: newObj.categoryId || oldObj.categoryId,
         amount: newObj.amount || oldObj.amount,
         bookImage: newObj.bookImage || oldObj.bookImage,
-        bookPrice : {
-            where : {
-                priceId : oldPriceId
-            },
-            price : {
-                expiredAt : new Date()
-            }
-        }
       },
-      create : {
-        bookPrice : {
-            price : {
-                price : newObj.price
-            }
-        }
-      },
-      include: {
-        category : {
-            id : true
-        },
-        bookPrice: {
-          include: {
-            price: {
-              select: {
-                price: true,
-              },
-            },
-          },
-        },
+      select: {
+        id : true,
+        enTitle: true,
+        thTitle: true,
+        enDescription: true,
+        thDescription: true,
+        categoryId: true,
+        amount: true,
+        bookImage: true,
+        price: {
+          where : {
+            expiredAt : null
+          }
+        } 
       },
     });
   },
+  deleteBook : async (id) => {
+    return prisma.book.update({
+      where : {
+        id
+      },
+      data : {
+        isActive : false
+      }
+    })
+  }
 };

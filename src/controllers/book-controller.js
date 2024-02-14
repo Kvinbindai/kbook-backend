@@ -2,21 +2,39 @@ const { bookSchema } = require("../validators/book-validator");
 const createError = require("http-errors");
 const bookService = require("../services/book-service");
 const priceService = require("../services/price-service");
-const bookPriceService = require("../services/bookPrice-service");
 const prisma = require("../models/prisma");
+
 module.exports = {
+  geAllBook : async (req,res,next)=>{
+   try{
+    const data = await bookService.findAllBook()
+    return res.status(200).json({
+      message : 'All Book',
+      data : data
+    })
+   }catch(err){
+    next(err)
+   }
+  },
+  getBookById : async (req,res,next)=>{
+    try{
+      const { bookId } = req.params
+      const data = await bookService.findBookById(+bookId)
+      return res.status(200).json({
+        message : 'Get Your Book',
+        data 
+      })
+    }catch(err){
+      next(err)
+    }
+  },
   addBook: async (req, res, next) => {
     try {
       const value = await bookSchema.validateAsync(req.body);
       const data = await bookService.createBook(value);
-      const price = data.bookPrice[0].price.price;
-      delete data.bookPrice;
       return res.status(200).json({
         message: "Create Book Complete",
-        data: {
-          ...data,
-          price: price,
-        },
+        data
       });
     } catch (err) {
       next(err);
@@ -28,30 +46,28 @@ module.exports = {
       const { bookId } = req.params;
       const value = await bookSchema.validateAsync(req.body);
       const oldObj = await bookService.findBookById(+bookId);
-      const oldPriceId = oldObj.bookPrice[0].priceId;
-      console.log(oldObj.bookPrice[0].priceId);
-      const firstStep = priceService.updatePriceStatus(oldPriceId)
-      const secondStep = priceService.create(value.price)
-      const thirdStep = bookPriceService.createRelation(+bookId,secondStep.id)
-      // const firstPromise = priceService.updatePriceStatus(oldPriceId);
-      // const secondPromise = await priceService.create(value.price); //secondPromise.id
-      // const newPriceId = secondPromise.id;
-      // const createRelation = bookPriceService.createRelation(
-      //   +bookId,
-      //   newPriceId
-      // );
-      // const thirdPromise = await bookService.updateBook(oldObj, value,oldPriceId);
-      // const result = await prisma.$transaction([
-      //   // firstPromise,
-      //   secondPromise,
-      //   // createRelation,
-      //   // thirdPromise
-      // ]);
-      res.json({
-        data: thirdPromise,
-      });
+      const oldPriceId = oldObj.price[0].id
+      const firstPromise = await priceService.updateExpiredPrice(oldPriceId,oldObj.id)
+      const secondPromise = await priceService.createPriceByBookId(value.price,oldObj.id)
+      const thirdPromise = await bookService.updateBook(oldObj,value)
+      const result = await Promise.all([firstPromise,secondPromise,thirdPromise]) 
+      return res.status(201).json({
+        message : "update Complete",
+        data : result[2]
+      })
     } catch (err) {
       next(err);
     }
   },
+  deleteBook : async(req,res,next)=>{
+    try{
+      const {bookId} = req.params
+      await bookService.deleteBook(+bookId)
+      return res.status(200).json({
+        message : 'delete complete'
+      })
+    }catch(err){
+      next(err)
+    }
+  }
 };
