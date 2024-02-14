@@ -1,0 +1,87 @@
+
+****************************************************
+/category
+    HEADER req.user.role === admin
+POST / add category BODY => { enTitle : string Or thTitle : String }
+PATCH /:id  edit category BODY => { enTitle : string Or thTitle : String  }
+GET / all category
+GET /:id get category by id
+DELETE /:id hide category 
+****************************************************
+
+****************************************************
+/book
+    HEADER req.user.role === admin
+POST / addBook 
+BODY => { enTitle : string Or thTitle : string , enDescription : string or thDescription : string , amount : Int , categoryId : Int }
+PATCH /:id editBook
+BODY => {enTitle : string Or thTitle : string , enDescription : string or thDescription : string , amount : Int , categoryId : Int }
+DELETE /:id hide book
+
+    HEADER req.user.role === admin || user
+GET / all book
+GET /:id getBookById
+***************************************************
+
+
+***************************************************
+/transactions
+    HEADER req.user.role === admin
+PATCH /:id editTransactions
+BODY => {status : 'SUCCESS/CANCELED' , note : string }
+
+    HEADER req.user.role ===  user
+POST / add Transaction 
+BODY => { userId : Int , basketId : Int , totalPrice : Int , slipImage : string , 
+province : string , district : string , sub_district : string , postCode : string , contactName : string , contactNumber : string , note : string }
+
+**************************************************
+
+****************************************************
+/contacts
+    HEADER req.user.role === user
+POST /  add contact
+BODY => {userId; Int,province : string , district : string , sub_district : string , postCode : string , contactName : string , contactNumber : string }
+PATCH /:id edit contact
+BODY => {userId; Int,province : string , district : string , sub_district : string , postCode : string , contactName : string , contactNumber : string }
+
+****************************************************
+
+****************************************************
+/price
+    HEADER req.user.role === admin
+POST / add price 
+BODY => {price : Int}
+PATCH /:id edit price
+BODY => {price : Int}
+
+****************************************************
+
+/bookPrice
+    HEADER req.user.role === admin
+POST / add bookPrice
+BODY => {bookId : Int , priceId : Int}
+
+
+****************************************************
+
+
+****************************************************
+/basket
+    HEADER  req.user.role === user
+POST / add basket for user
+BODY => { userId : Int }
+
+****************************************************
+
+/basketItem
+    HEADER req.user.role === user
+POST / add item to basket
+BODY => { basketId : Int , bookId : Int , amount : Int }
+PATCH /:basketId/:bookId
+BODY => { bookId : Int , amount : Int }
+DELETE /:basketId/:bookId
+BODY => set isActive : false
+
+
+****************************************************
