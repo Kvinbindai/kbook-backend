@@ -5,8 +5,10 @@ const app = express()
 const port = process.env.PORT
 const authRoute = require('./routes/auth-route')
 const categoryRoute = require('./routes/category-route')
-
+const userRoute = require('./routes/user-route')
 const bookRoute = require('./routes/book-route')
+const basketItemRoute = require('./routes/basketItem-route')
+const addressRoute = require('./routes/address-route')
 const { authenticate } = require('./middlewares/authenticate')
 
 
@@ -19,10 +21,15 @@ app.use('/auth',authRoute)
 //verifyToken => to check user => add req.user to req
 app.use(authenticate)
 
+app.use('/users',userRoute)
 
 app.use('/category',categoryRoute)
 
 app.use('/books',bookRoute)
+
+app.use('/basketItem',basketItemRoute)
+
+app.use('/address',addressRoute)
 
 
 //handleError

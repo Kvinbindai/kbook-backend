@@ -29,7 +29,12 @@ module.exports = {
         thTitle: true,
         enDescription: true,
         thDescription: true,
-        categoryId: true,
+        category :{
+          select : {
+            enTitle : true,
+            thTitle : true
+          }
+        },
         amount: true,
         bookImage: true,
         price: {
@@ -68,7 +73,6 @@ module.exports = {
     });
   },
   updateBook: async (oldObj, newObj) => {
-
     return prisma.book.update({
       where: { id: oldObj.id },
       data: {
@@ -97,6 +101,16 @@ module.exports = {
       },
     });
   },
+
+  updateBookWithNoPrice : (oldObj ,newObj) => {
+    return prisma.book.update({
+      where : {
+        id : oldObj.id
+      },
+      data : newObj
+    })
+  },
+
   deleteBook : async (id) => {
     return prisma.book.update({
       where : {

@@ -123,6 +123,7 @@ const bookData = [
     },
 ]
 
+
 const generateData = async () => {
    
     await prisma.category.createMany({

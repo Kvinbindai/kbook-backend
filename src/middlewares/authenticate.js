@@ -1,5 +1,6 @@
 const { verifyToken } = require("../services/token-service");
 const createError = require("http-errors");
+const userService = require("../services/user-service");
 const authenticate = async (req, res, next) => {
   try {
     const token = req.headers.authorization; //Bearer Token
@@ -11,7 +12,11 @@ const authenticate = async (req, res, next) => {
     else {
       const accessToken = token.split(" ")[1];
       const user = verifyToken(accessToken);
-      req.user = user;
+      const foundUser = await userService.findUserById(user.id)
+      delete foundUser.password
+      // console.log(foundUser)
+      req.user = foundUser;
+      
       next();
     }
   } catch (err) {
