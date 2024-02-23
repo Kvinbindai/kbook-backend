@@ -7,6 +7,7 @@ module.exports = {
     });
   },
 
+  
   findBasketIdByBookId: (basketId, bookId) => {
     return prisma.basketItem.findFirst({
       where: {
@@ -18,7 +19,10 @@ module.exports = {
   updateAmountBasketItemWhenAddSameBook: (obj, newAmount) => {
     return prisma.basketItem.update({
       where: {
-        id : obj.id
+        id : obj.id,
+        basket :{
+          isPaid : false
+        }
       },
       data: {
         amount: obj.amount + newAmount,
@@ -29,10 +33,40 @@ module.exports = {
   updateBasketItemByBasketId : (obj) => {
     return prisma.basketItem.update({
       where : {
-        id : obj.id
+        id : obj.id,
+        basket : {
+          isPaid : false
+        }
       },
       data : {
         amount : obj.amount
+      },
+      include : {
+        book : {
+          select : {
+            enTitle : true,
+            enDescription : true,
+            thDescription : true ,
+            thTitle : true ,
+            bookImage : true,
+            isActive : true,
+            category  : {
+              select : {
+                enTitle : true,
+                thTitle : true
+              }
+            },
+            price : {
+              where : {
+                expiredAt : null
+              },
+              select : {
+                price : true,
+                
+              }
+            }
+          }
+        },
       }
     })
   },
@@ -41,6 +75,9 @@ module.exports = {
     return prisma.basketItem.findMany({
       where : {
         basketId : id,
+        basket:{
+          isPaid: false
+        },
         book : {
           isActive : true
         }
@@ -73,5 +110,15 @@ module.exports = {
       }
     }
     })
-  }
+  },
+  updateAllBasketItemByBasketId : (basketId) => {
+    return prisma.basketItem.updateMany({
+      where : {
+        basketId : basketId,
+      },
+      data : {
+        amount : 0
+      }
+    })
+  } 
 };

@@ -6,7 +6,8 @@ const {
 const createError = require("http-errors");
 const bookService = require("../services/book-service");
 const priceService = require("../services/price-service");
-const prisma = require("../models/prisma");
+const uploadService = require("../services/upload-service");
+const fs = require("fs/promises");
 
 module.exports = {
   geAllBook: async (req, res, next) => {
@@ -47,11 +48,23 @@ module.exports = {
   },
   addBook: async (req, res, next) => {
     try {
+      console.log(req.body)
+      
+      req.body.categoryId = +req.body.categoryId;
+      req.body.amount = +req.body.amount;
+      req.body.price = +req.body.price;
+      console.log(req.file)
+      
+      req.body.bookImage = await uploadService.upload(req.file.path);
+      fs.unlink(req.file.path);
       const value = await addBookSchema.validateAsync(req.body);
+      // console.log(value)
       const data = await bookService.createBook(value);
+      const allList = await bookService.findAllBook()
       return res.status(200).json({
         message: "Create Book Complete",
         data,
+        allList
       });
     } catch (err) {
       next(err);
@@ -61,11 +74,25 @@ module.exports = {
   editBook: async (req, res, next) => {
     try {
       const { bookId } = req.params;
+      // req.body.price = +req.body.price;
+      console.log(req.body)
+      if(req.body.isActive === '0'){
+        req.body.isActive = false
+      }else{
+        req.body.isActive = true
+      }
+      
       const value = await UpdateBookSchema.validateAsync(req.body);
-      console.log(value);
       const oldObj = await bookService.findBookById(+bookId);
+      if(req.file){
+        value.bookImage = await uploadService.upload(req.file.path);
+        fs.unlink(req.file.path);
+      }else{
+        delete value.bookImage
+      }
       if (!value.price) {
         const data = await bookService.updateBookWithNoPrice(oldObj, value);
+        console.log(data)
         return res.status(201).json({
           message: "update Complete",
           data,
@@ -86,9 +113,9 @@ module.exports = {
           secondPromise,
           thirdPromise,
         ]);
-        data[2].price = data[2].price[0].price 
+        data[2].price = data[2].price[0].price;
         return res.status(201).json({
-          message: "update Complete",
+          message: "Update Complete",
           data: data[2],
         });
       }

@@ -8,7 +8,8 @@ const addBookSchema = Joi.object({
     thDescription : Joi.string().optional(),
     amount : Joi.number().optional(),
     categoryId : Joi.number().required().error(createError(400,'Category is required')),
-    price : Joi.number().required()
+    price : Joi.number().required(),
+    bookImage : Joi.string().required(),
 })
 const UpdateBookSchema = Joi.object({
     enTitle : Joi.string().optional(),
@@ -18,7 +19,8 @@ const UpdateBookSchema = Joi.object({
     amount : Joi.number().optional(),
     categoryId : Joi.number().optional(),
     price : Joi.number().optional(),
-    isActive: Joi.boolean().optional()
+    isActive: Joi.boolean().optional(),
+    bookImage : Joi.string().optional(),
 })
 
 module.exports = { addBookSchema  ,UpdateBookSchema }

@@ -19,5 +19,14 @@ module.exports = {
                 isPaid : true
             }
         })
-    }
+    },
+    findBasketByUserId : (userId) => {
+        return prisma.basket.findFirst({
+            where : {
+                userId : userId,
+                isPaid : false
+            }
+        })
+      }
+    
 }

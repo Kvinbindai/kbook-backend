@@ -1,14 +1,19 @@
 const prisma = require("../models/prisma");
-const priceService = require('../services/price-service')
-
+const priceService = require("../services/price-service");
 
 //เหลือ findBook
-
 
 module.exports = {
   findAllBook: () => {
     return prisma.book.findMany({
+
       include: {
+        category : {
+          select : {
+            enTitle : true ,
+            thTitle : true
+          }
+        },
         price: {
           where: {
             expiredAt: null,
@@ -20,28 +25,28 @@ module.exports = {
 
   findBookById: (id) => {
     return prisma.book.findFirst({
-      where: { 
-        id
-       },
+      where: {
+        id,
+      },
       select: {
-        id : true,
+        id: true,
         enTitle: true,
         thTitle: true,
         enDescription: true,
         thDescription: true,
-        category :{
-          select : {
-            enTitle : true,
-            thTitle : true
-          }
+        category: {
+          select: {
+            enTitle: true,
+            thTitle: true,
+          },
         },
         amount: true,
         bookImage: true,
         price: {
-          where : {
-            expiredAt : null
-          }
-        }
+          where: {
+            expiredAt: null,
+          },
+        },
       },
     });
   },
@@ -85,7 +90,7 @@ module.exports = {
         bookImage: newObj.bookImage || oldObj.bookImage,
       },
       select: {
-        id : true,
+        id: true,
         enTitle: true,
         thTitle: true,
         enDescription: true,
@@ -94,31 +99,51 @@ module.exports = {
         amount: true,
         bookImage: true,
         price: {
-          where : {
-            expiredAt : null
-          }
-        } 
+          where: {
+            expiredAt: null,
+          },
+        },
       },
     });
   },
 
-  updateBookWithNoPrice : (oldObj ,newObj) => {
+  updateBookWithNoPrice: (oldObj, newObj) => {
     return prisma.book.update({
-      where : {
-        id : oldObj.id
+      where: {
+        id: oldObj.id,
       },
-      data : newObj
-    })
+      data: newObj,
+    });
   },
 
-  deleteBook : async (id) => {
+  deleteBook: async (id) => {
     return prisma.book.update({
-      where : {
-        id
+      where: {
+        id,
       },
-      data : {
-        isActive : false
-      }
-    })
-  }
+      data: {
+        isActive: false,
+      },
+    });
+  },
+  getAmountOfBookByBookId: (id) => {
+    return prisma.book.findFirst({
+      where: {
+        id,
+      },
+      select: {
+        amount: true,
+      },
+    });
+  },
+  UpdateAmountBookByBookId: (id, newAmount) => {
+    return prisma.book.update({
+      where: {
+        id: id,
+      },
+      data: {
+        amount : newAmount
+      },
+    });
+  },
 };

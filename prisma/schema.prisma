@@ -132,13 +132,10 @@ model Transactions {
   basket        Basket  @relation(fields: [basketId], references: [id])
   totalPrice    Int     @map("total_price")
   status        Status  @default(PENDING)
-  province      String
-  district      String
-  subDistrct    String? @map("sub_district")
-  postCode      String  @map("post_code")
-  contactName   String? @map("contact_name")
-  contactNumber String? @map("contact_number")
   note          String?
+  slipImage     String @map("slip_image")
+   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
 
   @@map("transactions")
 }

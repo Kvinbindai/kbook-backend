@@ -4,6 +4,7 @@ module.exports = {
     addCategory : async ( req ,res , next ) => {
         try{
             const value = await categorySchema.validateAsync(req.body)
+            console.log(value)
             const data = await create(value)
             return res.status(201).json({
                 message : 'Create Complete',

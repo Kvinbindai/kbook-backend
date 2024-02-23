@@ -9,6 +9,7 @@ const userRoute = require('./routes/user-route')
 const bookRoute = require('./routes/book-route')
 const basketItemRoute = require('./routes/basketItem-route')
 const addressRoute = require('./routes/address-route')
+const transactionRoute = require('./routes/transaction-route')
 const { authenticate } = require('./middlewares/authenticate')
 
 
@@ -19,17 +20,19 @@ app.use(cors())
 //auth
 app.use('/auth',authRoute)
 //verifyToken => to check user => add req.user to req
-app.use(authenticate)
+
 
 app.use('/users',userRoute)
 
-app.use('/category',categoryRoute)
+app.use('/category',authenticate,categoryRoute)
 
 app.use('/books',bookRoute)
 
-app.use('/basketItem',basketItemRoute)
+app.use('/basketItem',authenticate,basketItemRoute)
 
-app.use('/address',addressRoute)
+app.use('/address',authenticate,addressRoute)
+
+app.use('/transactions',authenticate,transactionRoute)
 
 
 //handleError

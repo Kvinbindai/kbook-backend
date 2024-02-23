@@ -7,6 +7,10 @@ const {
 const basketItemService = require("../services/basketItem-service");
 const { createAccessToken } = require("../services/token-service");
 const { hashPassword, comparePassword } = require("../services/hash-service");
+const addressService = require("../services/address-service");
+const basketService = require("../services/basket-service");
+const transactionService = require("../services/transaction-service");
+const { basket } = require("../models/prisma");
 
 module.exports = {
   register: async (req, res, next) => {
@@ -25,6 +29,8 @@ module.exports = {
         });
       } else {
         const newUser = await userService.createUser(value);
+        newUser['basketId'] = newUser.baskets.id
+        delete newUser.baskets
         // const newBasket = await basketService.createBasket(newUser.id)
         // const result = await Promise.all([newUser,newBasket])
         delete newUser.password;
@@ -50,6 +56,38 @@ module.exports = {
       if (!isMatch) throw createError(404, "Invalid Credentials");
       delete foundUser.password;
       const accessToken = createAccessToken(foundUser);
+      if(foundUser.role !== "ADMIN"){
+        const myBasketId = await basketService.findBasketByUserId(foundUser.id)
+        // console.log(myBasketId)
+        const allItem = await basketItemService.getAllListInBasket(myBasketId.id)
+        // console.log(allItem)
+        const myContact = await addressService.findContactByUserId(foundUser.id)
+        let totalAmount = 0 
+        let totalPrice = 0
+        for(let i = 0;i<allItem.length;i++){
+          // console.log(allItem[i]['book']['price'][0]['price'])
+          allItem[i]['price'] = allItem[i]['book']['price'][0]['price']
+          totalAmount += allItem[i]['amount']
+          totalPrice += (allItem[i]['price']*allItem[i]['amount'])
+        }
+        const transactions = await transactionService.findAllTransactionByUserId(foundUser.id)
+        // const myBasketId = req.user.baskets[0]?.id;
+        // delete req.user.baskets;
+        // foundUser.basketId = 
+        return res.json({
+          message: "Get Your Profile",
+          user: {
+            ...foundUser,
+            ["basketId"]: myBasketId.id,
+            ['allItem'] : allItem,
+            totalAmount,
+            totalPrice,
+            contact : myContact,
+            transactions
+          },
+          accessToken,
+        });
+      }
       return res.status(200).json({
         message: "Login Success",
         user: foundUser,
@@ -63,6 +101,7 @@ module.exports = {
     try {
       if (req.user.role !== "ADMIN") {
         const allItem = await basketItemService.getAllListInBasket(req.user.basketId)
+        const myContact = await addressService.findContactByUserId(req.user.id)
         let totalAmount = 0 
         let totalPrice = 0
         for(let i = 0;i<allItem.length;i++){
@@ -73,6 +112,7 @@ module.exports = {
         }
         const myBasketId = req.user.baskets[0]?.id;
         delete req.user.baskets;
+        const transactions = await transactionService.findAllTransactionByUserId(req.user.id)
         return res.json({
           message: "Get Your Profile",
           user: {
@@ -80,7 +120,9 @@ module.exports = {
             ["basketId"]: myBasketId,
             ['allItem'] : allItem,
             totalAmount,
-            totalPrice
+            totalPrice,
+            contact : myContact,
+            transactions
           },
         });
       }
